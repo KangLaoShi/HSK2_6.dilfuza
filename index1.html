@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第6课：你怎么不吃了 - HSK 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 3D Flip Card Utilities */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .transition-transform { transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f0fdf4; }
+        ::-webkit-scrollbar-thumb { background: #86efac; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #22c55e; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in { animation: fadeIn 0.3s ease-in; }
+
+        .active-tab { 
+            border-bottom-color: #fde047 !important; 
+            background-color: #166534 !important; 
+        }
+    </style>
+</head>
+<body class="bg-green-50 text-gray-800 font-sans h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-green-800 text-white p-3 sm:p-4 shadow-md z-10 text-center shrink-0">
+        <h1 class="text-xl sm:text-3xl font-bold m-0">第6课：你怎么不吃了</h1>
+        <p class="mt-1 text-green-200 text-xs sm:text-base">Lesson 6: Nega buncha kam yeysan?</p>
+        <p class="mt-1 sm:mt-2 text-yellow-300 text-xs sm:text-base font-bold tracking-wide">Dilfuza Kāng lǎo shī bilan xitoy tilini o'rganmiz</p>
+    </header>
+
+    <!-- Navigation (Flex Wrap for Mobile) -->
+    <nav class="bg-green-500 flex flex-wrap shadow-sm z-10 shrink-0 text-sm sm:text-base">
+        <button onclick="switchTab('flashcards')" id="btn-flashcards" class="nav-btn flex-1 py-2 sm:py-3 px-1 text-white font-semibold hover:bg-green-600 transition-colors border-b-4 border-transparent active-tab whitespace-nowrap">生词闪卡</button>
+        <button onclick="switchTab('dialogues')" id="btn-dialogues" class="nav-btn flex-1 py-2 sm:py-3 px-1 text-white font-semibold hover:bg-green-600 transition-colors border-b-4 border-transparent whitespace-nowrap">对话内容</button>
+        <button onclick="switchTab('grammar')" id="btn-grammar" class="nav-btn flex-1 py-2 sm:py-3 px-1 text-white font-semibold hover:bg-green-600 transition-colors border-b-4 border-transparent whitespace-nowrap">语法解释</button>
+        <button onclick="switchTab('vocab-test')" id="btn-vocab-test" class="nav-btn flex-1 py-2 sm:py-3 px-1 text-white font-semibold hover:bg-green-600 transition-colors border-b-4 border-transparent whitespace-nowrap">生词测试</button>
+        <button onclick="switchTab('comp-test')" id="btn-comp-test" class="nav-btn flex-1 py-2 sm:py-3 px-1 text-white font-semibold hover:bg-green-600 transition-colors border-b-4 border-transparent whitespace-nowrap">综合测试</button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-8 relative" id="main-content">
+        
+        <!-- Flashcards Section -->
+        <section id="flashcards" class="tab-section h-full flex flex-col items-center justify-center max-w-2xl mx-auto animate-fade-in">
+            <div id="flashcard-counter" class="text-green-800 font-bold mb-4 text-lg"></div>
+            
+            <!-- Card dimension designed for mobile friendliness (aspect-ratio 4:5) -->
+            <div class="perspective-1000 w-[90%] max-w-[340px] aspect-[4/5] sm:aspect-auto sm:h-80 mx-auto cursor-pointer" onclick="toggleFlip()">
+                <div id="flashcard-inner" class="relative w-full h-full transition-transform transform-style-3d shadow-xl rounded-2xl">
+                    <!-- Front -->
+                    <div class="absolute w-full h-full backface-hidden bg-white border-4 border-green-500 rounded-2xl flex flex-col items-center justify-center p-6 text-center">
+                        
+                        <!-- Speaker Button -->
+                        <button onclick="playCurrentFlashcardAudio(event)" class="absolute top-3 right-3 text-green-500 hover:text-green-700 p-2 rounded-full hover:bg-green-50 transition-colors z-10" title="Tinglash (Play)">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5 10v4a2 2 0 002 2h2.586l3.707 3.707a1 1 0 001.707-.707V5.414a1 1 0 00-1.707-.707L9.586 10H7a2 2 0 00-2 2z" />
+                            </svg>
+                        </button>
+
+                        <!-- Centered Content -->
+                        <div id="fc-zh" class="text-7xl sm:text-8xl font-bold text-green-800 mb-2"></div>
+                        <div id="fc-py" class="text-2xl sm:text-3xl text-gray-500"></div>
+
+                        <div class="text-sm text-gray-400 absolute bottom-4 w-full text-center">(Aylantirish uchun bosing)</div>
+                    </div>
+                    <!-- Back -->
+                    <div class="absolute w-full h-full backface-hidden bg-green-100 border-4 border-green-600 rounded-2xl flex flex-col items-center justify-center p-6 text-center rotate-y-180">
+                        <div id="fc-uz" class="text-3xl sm:text-4xl font-bold text-green-900 leading-tight"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-4 mt-8 w-[90%] max-w-[340px]">
+                <button id="btn-prev" onclick="prevCard()" class="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-3 px-4 rounded-lg shadow transition-colors">&larr; Oldingi</button>
+                <button id="btn-next" onclick="nextCard()" class="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-3 px-4 rounded-lg shadow transition-colors">Keyingi &rarr;</button>
+            </div>
+        </section>
+
+        <!-- Dialogues Section -->
+        <section id="dialogues" class="tab-section hidden max-w-3xl mx-auto pb-10">
+            <!-- Injected via JS -->
+        </section>
+
+        <!-- Grammar Section -->
+        <section id="grammar" class="tab-section hidden max-w-3xl mx-auto pb-10">
+            <!-- Injected via JS -->
+        </section>
+
+        <!-- Vocab Test Section -->
+        <section id="vocab-test" class="tab-section hidden max-w-xl mx-auto pb-10">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-green-800">生词测试 (Vocabulary Test)</h2>
+            </div>
+            <div id="vocab-test-container">
+                <!-- Quiz Injected via JS -->
+            </div>
+        </section>
+
+        <!-- Comp Test Section -->
+        <section id="comp-test" class="tab-section hidden max-w-xl mx-auto pb-10">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-green-800">综合测试 (Grammar & Comp Test)</h2>
+            </div>
+            <div id="comp-test-container">
+                <!-- Quiz Injected via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 text-center p-3 text-sm shrink-0">
+        <p class="mb-1 text-gray-300">HSK 2 Standard Course - Lesson 6</p>
+        <p>&copy; 2026 Dilfuza Kāng lǎo shī (telegram@diffila)</p>
+    </footer>
+
+    <script>
+        // --- Data Definitions ---
+        const vocabData = [
+            {zh: '门', py: 'mén', uz: 'darvoza, eshik'},
+            {zh: '外', py: 'wài', uz: 'tashqarida'},
+            {zh: '自行车', py: 'zìxíngchē', uz: 'velosiped'},
+            {zh: '羊肉', py: 'yángròu', uz: "qo'y go'shti"},
+            {zh: '好吃', py: 'hǎochī', uz: 'shirin, mazali'},
+            {zh: '面条', py: 'miàntiáo', uz: "lag'mon"},
+            {zh: '打篮球', py: 'dǎ lánqiú', uz: "basketbol o'ynamoq"},
+            {zh: '因为', py: 'yīnwèi', uz: 'chunki'},
+            {zh: '所以', py: 'suǒyǐ', uz: 'shuning uchun'},
+            {zh: '游泳', py: 'yóu yǒng', uz: 'suzish'},
+            {zh: '经常', py: 'jīngcháng', uz: 'odatda; tez-tez'},
+            {zh: '公斤', py: 'gōngjīn', uz: 'kilogramm'},
+            {zh: '姐姐', py: 'jiějie', uz: 'opa'}
+        ];
+
+        const dialoguesData = [
+            {
+                title: "1. 在学校 Maktabda",
+                lines: [
+                    {s: 'A', zh: '你知道小王今天什么时候来学校吗?', py: 'Nǐ zhīdào Xiǎo Wáng jīntiān shénme shíhou lái xuéxiào ma?', uz: 'Siao Vang bugun maktabga qachon kelishini bilasanmi?', ru: 'Ты знаешь, когда Сяо Ван сегодня придет в школу?', en: 'Do you know what time Xiao Wang is coming to school today?'},
+                    {s: 'B', zh: '他已经来了。', py: 'Tā yǐjīng lái le.', uz: 'U allaqachon kelgan.', ru: 'Он уже пришел.', en: 'He has already arrived.'},
+                    {s: 'A', zh: '你怎么知道他来了?', py: 'Nǐ zěnme zhīdào tā lái le?', uz: 'Uni kelganini sen qayerdan bilding?', ru: 'Откуда ты знаешь, что он пришел?', en: 'How do you know he is here?'},
+                    {s: 'B', zh: '我在门外看见他的自行车了。', py: 'Wǒ zài mén wài kànjiàn tā de zìxíngchē le.', uz: "Darvoza oldida uning velosipedini ko'rdim.", ru: 'Я видел его велосипед за дверью (на улице).', en: 'I saw his bicycle outside the door.'}
+                ]
+            },
+            {
+                title: "2. 在饭馆 Restoranda",
+                lines: [
+                    {s: 'A', zh: '今天的羊肉很好吃,你怎么不吃了?', py: 'Jīntiān de yángròu hěn hǎochī, nǐ zěnme bù chī le?', uz: "Bugungi qo'y go'shti juda shirin ekan, sen nega yemading?", ru: 'Сегодняшняя баранина очень вкусная, почему ты больше не ешь?', en: "Today's mutton is very delicious, why aren't you eating anymore?"},
+                    {s: 'B', zh: '这个星期天天都吃羊肉,不想吃了。', py: 'Zhège xīngqī tiāntiān dōu chī yángròu, bù xiǎng chī le.', uz: "Shu haftada har kuni qo'y go'shti yedim, yegim kelmayapti.", ru: 'На этой неделе каждый день ем баранину, больше не хочу.', en: "I've been eating mutton every day this week, I don't want to eat it anymore."},
+                    {s: 'A', zh: '那你还想吃什么?', py: 'Nà nǐ hái xiǎng chī shénme?', uz: 'Unda nima yeyishni xohlaysan?', ru: 'Тогда что еще ты хочешь поесть?', en: 'Then what else would you like to eat?'},
+                    {s: 'B', zh: '来一点儿面条吧。', py: 'Lái yìdiǎnr miàntiáo ba.', uz: "Iltimos, bir oz lag'mon keltiring.", ru: 'Принесите немного лапши.', en: 'Bring some noodles, please.'}
+                ]
+            },
+            {
+                title: "3. 在健身房 Fitnes markazida",
+                lines: [
+                    {s: 'A', zh: '昨天你们怎么都没去打篮球?', py: 'Zuótiān nǐmen zěnme dōu méi qù dǎ lánqiú?', uz: "Nimaga kecha basketbol o'ynashga bormadinglar?", ru: 'Почему вы все вчера не пошли играть в баскетбол?', en: "Why didn't any of you go play basketball yesterday?"},
+                    {s: 'B', zh: '因为昨天下雨,所以我们都没去。我去游泳了。', py: 'Yīnwèi zuótiān xià yǔ, suǒyǐ wǒmen dōu méi qù. Wǒ qù yóu yǒng le.', uz: "Chunki kecha yomg'ir yog'gandi, shuning uchun hech kim bormadi. Men cho'milishga bordim.", ru: 'Потому что вчера шел дождь, поэтому мы не пошли. Я ходил плавать.', en: 'Because it rained yesterday, so none of us went. I went swimming.'},
+                    {s: 'A', zh: '你经常游泳吗?', py: 'Nǐ jīngcháng yóu yǒng ma?', uz: "Sen tez-tez cho'milishga borib turasanmi?", ru: 'Ты часто плаваешь?', en: 'Do you swim often?'},
+                    {s: 'B', zh: '这个月我天天游泳,我现在七十公斤了。', py: 'Zhège yuè wǒ tiāntiān yóu yǒng, wǒ xiànzài qīshí gōngjīn le.', uz: "Bu oyda har kuni cho'milishga boryapman, hozir og'irligim 70 kg.", ru: 'В этом месяце я плаваю каждый день, сейчас я вешу 70 килограммов.', en: 'I swim every day this month, I am 70 kilograms now.'}
+                ]
+            },
+            {
+                title: "4. 在办公室 Ofisda",
+                lines: [
+                    {s: 'A', zh: '这两天怎么没看见小张?', py: 'Zhè liǎng tiān zěnme méi kànjiàn Xiǎo Zhāng?', uz: "Shu ikki kunda Siao Jang ko'rinmadi, biror joyga ketdimi?", ru: 'Почему эти два дня не видно Сяо Чжана?', en: 'Why haven\'t I seen Xiao Zhang these past two days?'},
+                    {s: 'B', zh: '他去北京了。', py: 'Tā qù Běijīng le.', uz: 'U Pekinga ketdi.', ru: 'Он уехал в Пекин.', en: 'He went to Beijing.'},
+                    {s: 'A', zh: '去北京了?是去旅游吗?', py: 'Qù Běijīng le? Shì qù lǚyóu ma?', uz: 'Pekinga ketdi? Sayohatga ketdimi?', ru: 'Уехал в Пекин? Поехал путешествовать?', en: 'Went to Beijing? Did he go traveling?'},
+                    {s: 'B', zh: '不是,听说是去看他姐姐。', py: 'Bú shì, tīngshuō shì qù kàn tā jiějie.', uz: "Yo'q, eshitishimcha, opasini ko'rishga ketgan.", ru: 'Нет, говорят, поехал навестить старшую сестру.', en: 'No, I heard he went to see his older sister.'}
+                ]
+            }
+        ];
+
+        const grammarData = [
+            {
+                title: "1. 疑问代词“怎么” (“怎么” so'roq olmoshi)",
+                descUz: "Biror bir ishning sababi so'ralganda “怎么 + fe'l/sifat” qo'llaniladi. Bunday gap orqali asosan hayrat va taajjub ifodalanadi.",
+                descRu: "Используется для вопроса о причине чего-либо, «怎么 + глагол/прилагательное» выражает удивление или изумление.",
+                descEn: "Used to ask about the cause of something, '怎么 + verb/adjective' indicates surprise or astonishment.",
+                examples: ["你怎么不高兴？ (Nega xafa ko'rinasan?)", "昨天你们怎么都没去打篮球？ (Nimaga kecha basketbol o'ynashga bormadinglar?)"]
+            },
+            {
+                title: "2. 量词的重叠 (Hisob so'zlarning urg'usi)",
+                descUz: "Hisob so'zlarning takrorlanishi 'har biri' degan ma'noni anglatadi. Odatda biror guruhning har bir a'zosini alohida ta'kidlab ko'rsatganda ishlatiladi va hisob so'z takroridan keyin albatta “都” ravishi qo'yiladi.",
+                descRu: "Повторение счетных слов означает «каждый». Оно выделяет каждого члена определенной группы, и после него обычно следует наречие «都».",
+                descEn: "Reduplication of measure words means 'every' or 'each'. It highlights every member of a specific group, and the adverb '都' usually follows.",
+                examples: ["同学们个个都很高兴。(Talabalarning har biri juda xursand.)", "这个星期天天都吃羊肉。(Bu haftada har kuni qo'y go'shti yedim.)", "衣服件件都很漂亮。(Kiyimlarning har biri chiroyli.)"]
+            },
+            {
+                title: "3. 关联词“因为...所以...” (Sabab bog'lovchilari)",
+                descUz: "Sabab bog'lovchilari ishtirokidagi qo'shma gaplarning birinchi qismida sabab, ikkinchi qismida esa natija keladi.",
+                descRu: "В предложениях с причинно-следственными союзами первая часть указывает на причину, а вторая — на результат.",
+                descEn: "In sentences with causal conjunctions, the first clause states the cause, and the second clause states the result.",
+                examples: ["因为昨天下雨，所以我们都没去。(Chunki kecha yomg'ir yog'di, shuning uchun biz bormadik.)", "因为他每天跑步，所以身体很好。(Chunki u har kuni yuguradi, shuning uchun sog'lig'i yaxshi.)"]
+            }
+        ];
+
+        // New Vocab Test Data
+        const vocabTestData = [
+            {q: '"门 (mén)" so\'zining o\'zbekcha ma\'nosi nima?', opts: ["tashqarida", "darvoza, eshik", "velosiped", "opa"], ans: 1},
+            {q: '"yángròu" qanday tarjima qilinadi?', opts: ["mol go'shti", "tovuq go'shti", "qo'y go'shti", "baliq go'shti"], ans: 2},
+            {q: '"好吃 (hǎochī)" nimani anglatadi?', opts: ["shirin, mazali", "yomon", "katta", "kichik"], ans: 0},
+            {q: '"suzish" so\'zining xitoychasi qaysi?', opts: ["跑步 (pǎobù)", "游泳 (yóu yǒng)", "打篮球 (dǎ lánqiú)", "踢足球 (tī zúqiú)"], ans: 1},
+            {q: '"velosiped" xitoy tilida qanday yoziladi?', opts: ["自行车", "汽车", "火车", "飞机"], ans: 0},
+            {q: '"经常 (jīngcháng)" so\'zining ma\'nosi nima?', opts: ["hech qachon", "ba'zan", "odatda; tez-tez", "doimo"], ans: 2},
+            {q: '"opa" degan ma\'noni bildiruvchi so\'z qaysi?', opts: ["哥哥 (gēge)", "弟弟 (dìdi)", "妹妹 (mèimei)", "姐姐 (jiějie)"], ans: 3},
+            {q: '"kilogramm" xitoychada qanday aytiladi?', opts: ["公里 (gōnglǐ)", "公斤 (gōngjīn)", "个 (gè)", "件 (jiàn)"], ans: 1},
+            {q: '"chunki" ma\'nosini bildiruvchi so\'z qaysi?', opts: ["所以 (suǒyǐ)", "因为 (yīnwèi)", "怎么 (zěnme)", "什么 (shénme)"], ans: 1},
+            {q: '"shuning uchun" xitoy tilida nima deyiladi?', opts: ["所以 (suǒyǐ)", "因为 (yīnwèi)", "怎么 (zěnme)", "什么 (shénme)"], ans: 0}
+        ];
+
+        const compTestData = [
+            {q: 'Nega xafa ko\'rinasan? - 你 ___ 不高兴？', opts: ['什么', '怎么', '哪儿', '谁'], ans: 1},
+            {q: 'Har bir kiyim chiroyli. - 衣服 ___ 都很漂亮。', opts: ['个个', '天天', '件件', '年年'], ans: 2},
+            {q: '___ 昨天下雨，所以我们没去。', opts: ['因为', '所以', '怎么', '经常'], ans: 0},
+            {q: 'U qachon maktabga kelishini bilasanmi? - 你知道小王今天 ___ 来学校吗？', opts: ['什么', '什么时候', '怎么', '谁'], ans: 1},
+            {q: 'Bu oyda har kuni cho\'milishga boryapman. - 这个月我 ___ 游泳。', opts: ['天天', '件件', '个个', '本本'], ans: 0},
+            {q: 'Uni kelganini sen qayerdan bilding? - 你怎么知道他 ___？', opts: ['来', '来了', '去', '去了'], ans: 1},
+            {q: 'Darvoza oldida uning velosipedini ko\'rdim. - 我在 ___ 看见他的自行车了。', opts: ['门内', '门外', '门上', '门下'], ans: 1},
+            {q: 'Unda nima yeyishni xohlaysan? - 那你 ___ 想吃什么？', opts: ['还', '也', '都', '很'], ans: 0},
+            {q: 'Iltimos, bir oz lag\'mon keltiring. - ___ 一点儿面条吧。', opts: ['去', '吃', '来', '买'], ans: 2},
+            {q: 'Eshitishimcha, opasini ko\'rishga ketgan. - 听说是去 ___ 他姐姐。', opts: ['看', '听', '说', '读'], ans: 0}
+        ];
+
+        // --- Application State & Logic ---
+        let currentFlashcard = 0;
+        let isFlipped = false;
+        
+        // Quiz Engine State
+        let currentQuizType = null;
+        let quizState = {
+            'vocab': { currentIdx: 0, score: 0, answered: false },
+            'comp': { currentIdx: 0, score: 0, answered: false }
+        };
+
+        // --- Audio Playback ---
+        function playAudio(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN'; 
+                utterance.rate = 0.85; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.warn("Speech Synthesis is not supported in this browser.");
+            }
+        }
+
+        function playCurrentFlashcardAudio(event) {
+            event.stopPropagation(); 
+            const text = vocabData[currentFlashcard].zh;
+            playAudio(text);
+        }
+
+        function init() {
+            renderDialogues();
+            renderGrammar();
+            updateFlashcard();
+            
+            // Initialize Quizzes quietly
+            quizState['vocab'].currentIdx = 0; quizState['vocab'].score = 0;
+            quizState['comp'].currentIdx = 0; quizState['comp'].score = 0;
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            // Update buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-tab'));
+            document.getElementById('btn-' + tabId).classList.add('active-tab');
+            
+            // Update content views
+            document.querySelectorAll('.tab-section').forEach(content => {
+                content.classList.add('hidden');
+                content.classList.remove('animate-fade-in');
+            });
+            
+            const targetSection = document.getElementById(tabId);
+            targetSection.classList.remove('hidden');
+            void targetSection.offsetWidth; // Trigger reflow
+            targetSection.classList.add('animate-fade-in');
+            
+            // Scroll to top
+            document.getElementById('main-content').scrollTop = 0;
+
+            // Trigger Quiz rendering if it's a quiz tab
+            if(tabId === 'vocab-test') startQuiz('vocab', false);
+            if(tabId === 'comp-test') startQuiz('comp', false);
+        }
+
+        // --- Flashcard Logic ---
+        function updateFlashcard() {
+            const card = vocabData[currentFlashcard];
+            document.getElementById('fc-zh').textContent = card.zh;
+            document.getElementById('fc-py').textContent = card.py;
+            document.getElementById('fc-uz').textContent = card.uz;
+            document.getElementById('flashcard-counter').textContent = `So'z ${currentFlashcard + 1} / ${vocabData.length}`;
+            
+            isFlipped = false;
+            document.getElementById('flashcard-inner').classList.remove('rotate-y-180');
+
+            document.getElementById('btn-prev').disabled = currentFlashcard === 0;
+            document.getElementById('btn-next').disabled = currentFlashcard === vocabData.length - 1;
+        }
+
+        function toggleFlip() {
+            isFlipped = !isFlipped;
+            const inner = document.getElementById('flashcard-inner');
+            if(isFlipped) inner.classList.add('rotate-y-180');
+            else inner.classList.remove('rotate-y-180');
+        }
+
+        function nextCard() {
+            if (currentFlashcard < vocabData.length - 1) {
+                currentFlashcard++; updateFlashcard();
+            }
+        }
+
+        function prevCard() {
+            if (currentFlashcard > 0) {
+                currentFlashcard--; updateFlashcard();
+            }
+        }
+
+        // --- Render Dialogues ---
+        function renderDialogues() {
+            const container = document.getElementById('dialogues');
+            let html = '';
+            dialoguesData.forEach(d => {
+                html += `
+                <div class="bg-white rounded-xl p-6 mb-6 shadow-sm border-l-4 border-green-500">
+                    <h3 class="text-xl font-bold text-green-800 mb-4 pb-2 border-b-2 border-gray-100">${d.title}</h3>
+                    <div class="space-y-4">
+                `;
+                d.lines.forEach(l => {
+                    html += `
+                        <div class="flex gap-3 sm:gap-4">
+                            <div class="w-10 h-10 shrink-0 bg-green-500 text-white rounded-full flex items-center justify-center font-bold shadow-sm mt-1">
+                                ${l.s}
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg flex-1 border border-gray-100 relative pr-12">
+                                <button onclick="playAudio('${l.zh.replace(/'/g, "\\'")}')" class="absolute top-4 right-3 text-gray-400 hover:text-green-600 transition-colors bg-white rounded-full p-1.5 shadow-sm border border-gray-200" title="Tinglash (Play)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5 10v4a2 2 0 002 2h2.586l3.707 3.707a1 1 0 001.707-.707V5.414a1 1 0 00-1.707-.707L9.586 10H7a2 2 0 00-2 2z" />
+                                    </svg>
+                                </button>
+                                
+                                <p class="text-lg text-gray-900 mb-1 font-medium">${l.zh}</p>
+                                <p class="text-sm text-gray-500 mb-3 pb-3 border-b border-gray-200">${l.py}</p>
+                                
+                                <div class="space-y-2">
+                                    <div class="flex items-start gap-2">
+                                        <span class="text-[10px] font-bold text-white bg-blue-500 px-1.5 py-0.5 rounded leading-none mt-0.5 shrink-0">UZ</span>
+                                        <p class="text-sm text-gray-700 italic leading-snug">${l.uz}</p>
+                                    </div>
+                                    <div class="flex items-start gap-2">
+                                        <span class="text-[10px] font-bold text-white bg-red-500 px-1.5 py-0.5 rounded leading-none mt-0.5 shrink-0">RU</span>
+                                        <p class="text-sm text-gray-700 italic leading-snug">${l.ru}</p>
+                                    </div>
+                                    <div class="flex items-start gap-2">
+                                        <span class="text-[10px] font-bold text-white bg-indigo-500 px-1.5 py-0.5 rounded leading-none mt-0.5 shrink-0">EN</span>
+                                        <p class="text-sm text-gray-700 italic leading-snug">${l.en}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div></div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // --- Render Grammar ---
+        function renderGrammar() {
+            const container = document.getElementById('grammar');
+            let html = '';
+            grammarData.forEach(g => {
+                html += `
+                <div class="bg-white rounded-xl p-5 sm:p-6 mb-6 shadow-sm border-t-4 border-green-500">
+                    <h3 class="text-xl font-bold text-green-800 mb-4">${g.title}</h3>
+                    
+                    <div class="space-y-4 mb-6">
+                        <div class="flex gap-3 items-start">
+                            <span class="text-xs font-bold text-white bg-blue-500 px-2 py-1 rounded shrink-0 mt-1">UZ</span>
+                            <p class="text-gray-700 leading-relaxed text-sm sm:text-base">${g.descUz}</p>
+                        </div>
+                        <div class="flex gap-3 items-start">
+                            <span class="text-xs font-bold text-white bg-red-500 px-2 py-1 rounded shrink-0 mt-1">RU</span>
+                            <p class="text-gray-700 leading-relaxed text-sm sm:text-base">${g.descRu}</p>
+                        </div>
+                        <div class="flex gap-3 items-start">
+                            <span class="text-xs font-bold text-white bg-indigo-500 px-2 py-1 rounded shrink-0 mt-1">EN</span>
+                            <p class="text-gray-700 leading-relaxed text-sm sm:text-base">${g.descEn}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 mt-4 pt-4 border-t border-gray-100">
+                `;
+                g.examples.forEach(ex => {
+                    html += `
+                        <div class="bg-green-50 border-l-4 border-green-400 p-3 text-gray-800 rounded-r-lg font-medium">
+                            ${ex}
+                        </div>
+                    `;
+                });
+                html += `</div></div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // --- Single Question Quiz Engine ---
+        function startQuiz(type, reset = true) {
+            currentQuizType = type;
+            if(reset) {
+                quizState[type].currentIdx = 0;
+                quizState[type].score = 0;
+                quizState[type].answered = false;
+            }
+            renderQuiz();
+        }
+
+        function renderQuiz() {
+            const type = currentQuizType;
+            const state = quizState[type];
+            const data = type === 'vocab' ? vocabTestData : compTestData;
+            const container = document.getElementById(`${type}-test-container`);
+            
+            // Check if test is finished
+            if(state.currentIdx >= data.length) {
+                container.innerHTML = `
+                    <div class="text-center bg-white p-8 rounded-2xl shadow-xl border-4 border-green-500 animate-fade-in">
+                        <h3 class="text-3xl font-bold text-green-800 mb-4">Natija: ${state.score} / ${data.length}</h3>
+                        <p class="text-lg text-gray-600 mb-6">${state.score === data.length ? "Zo'r! Siz barcha savollarga to'g'ri javob berdingiz! 🎉" : "Yaxshi natija! Yana ozgina harakat qiling. 👍"}</p>
+                        <button onclick="startQuiz('${type}', true)" class="bg-green-100 hover:bg-green-200 text-green-800 font-bold py-3 px-8 rounded-xl border border-green-300 transition-colors shadow-sm">Qayta ishlash (Retry)</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const q = data[state.currentIdx];
+            state.answered = false;
+
+            let html = `
+                <div class="bg-white rounded-xl p-6 sm:p-8 shadow-md border-t-4 border-green-500 animate-fade-in">
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-sm text-green-700 font-bold mb-2">
+                            <span>Savol ${state.currentIdx + 1} / ${data.length}</span>
+                            <span>To'g'ri: ${state.score}</span>
+                        </div>
+                        <div class="w-full bg-green-100 rounded-full h-2.5">
+                          <div class="bg-green-500 h-2.5 rounded-full transition-all duration-300" style="width: ${(state.currentIdx / data.length) * 100}%"></div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl sm:text-2xl font-bold text-gray-800 mb-6 leading-snug">${q.q}</h3>
+                    
+                    <!-- Options -->
+                    <div class="space-y-3">
+            `;
+
+            q.opts.forEach((opt, oIndex) => {
+                html += `
+                    <button id="opt-${type}-${oIndex}" onclick="selectAnswer(${oIndex})" class="w-full text-left p-4 rounded-xl border-2 border-gray-200 hover:border-green-500 hover:bg-green-50 transition-all text-lg font-medium text-gray-700 block">
+                        <span class="inline-block w-8 font-bold text-green-600">${String.fromCharCode(65 + oIndex)})</span> ${opt}
+                    </button>
+                `;
+            });
+
+            html += `
+                    </div>
+                    
+                    <!-- Next Button (Hidden initially) -->
+                    <div id="next-btn-container-${type}" class="mt-8 hidden text-center">
+                        <button onclick="nextQuizQuestion()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-transform hover:scale-105 w-full sm:w-auto text-lg">Keyingi savol (Next)</button>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function selectAnswer(selectedIndex) {
+            const type = currentQuizType;
+            const state = quizState[type];
+            if(state.answered) return;
+            state.answered = true;
+
+            const data = type === 'vocab' ? vocabTestData : compTestData;
+            const q = data[state.currentIdx];
+
+            // Evaluate buttons
+            q.opts.forEach((_, idx) => {
+                const btn = document.getElementById(`opt-${type}-${idx}`);
+                btn.disabled = true;
+                btn.classList.remove('hover:border-green-500', 'hover:bg-green-50', 'border-gray-200');
+                
+                if(idx === q.ans) {
+                    btn.classList.add('border-green-500', 'bg-green-100', 'text-green-900'); // Correct
+                } else if (idx === selectedIndex) {
+                    btn.classList.add('border-red-400', 'bg-red-50', 'text-red-800'); // Wrong Selection
+                } else {
+                    btn.classList.add('border-gray-100', 'opacity-50'); // Others disabled
+                }
+            });
+
+            if(selectedIndex === q.ans) {
+                state.score++;
+            }
+
+            document.getElementById(`next-btn-container-${type}`).classList.remove('hidden');
+            
+            // Auto scroll slightly to ensure NEXT button is visible on small screens
+            setTimeout(() => {
+                const btnContainer = document.getElementById(`next-btn-container-${type}`);
+                btnContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function nextQuizQuestion() {
+            const type = currentQuizType;
+            quizState[type].currentIdx++;
+            renderQuiz();
+            document.getElementById('main-content').scrollTop = 0;
+        }
+
+        // Initialize App
+        window.onload = init;
+    </script>
+</body>
+</html>
